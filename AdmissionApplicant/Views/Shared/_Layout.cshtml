@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вступи.kz — Система подачи заявлений</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <header class="bg-white shadow-xl sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="text-2xl font-bold text-cyan-600">Вступи<span class="text-yellow-400">.kz</span></a>
+                <nav>
+                    <ul class="flex space-x-6 text-sm font-medium">
+                        <li><a href="/Specialization" class="text-gray-700 hover:text-cyan-600 transition">Специальности</a></li>
+                        @if (Context.Session.GetInt32("UserID") != null)
+                        {
+                            <li><a href="/Application" class="text-gray-700 hover:text-cyan-600 transition">Заявления</a></li>
+                            <li><a href="/Account/Logout" class="text-gray-700 hover:text-red-500 transition">Выйти</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Account/Login" class="text-gray-700 hover:text-cyan-600 transition">Войти</a></li>
+                            <li><a href="/Account/Register" class="bg-cyan-600 text-white px-4 py-1.5 rounded-md hover:bg-cyan-700 transition">Регистрация</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="mx-auto">
+        @RenderBody()
+    </main>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

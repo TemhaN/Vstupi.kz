@@ -1,0 +1,66 @@
+﻿@model List<AdmissionSystem.Models.Specialization>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Специальности - Вступи.kz</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-gray-100">
+    <div class="w-full py-24 px-4 sm:px-12 bg-gradient-to-r from-cyan-700 to-sky-500">
+        <div class="max-w-screen-2xl mx-auto">
+            <h2 class="text-4xl sm:text-5xl font-bold text-white mb-12 text-center">Специальности</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                @foreach (var spec in Model)
+                {
+                    var grant = ViewBag.Grants.ContainsKey(spec.SpecializationID) ? ViewBag.Grants[spec.SpecializationID] : null;
+                    <div class="specialization-card bg-white rounded-xl shadow-lg p-6 sm:p-8 hover:shadow-xl hover:-translate-y-1 transition-shadow transition-transform">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-graduation-cap text-cyan-700 text-2xl mr-3"></i>
+                            <h3 class="text-xl sm:text-2xl font-semibold text-gray-900">@(spec.SpecializationName ?? "Не указана")</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-university text-cyan-700 text-lg mr-2"></i>
+                                <p class="text-base sm:text-lg text-gray-600">
+                                    <span class="font-medium text-gray-700">Факультет:</span> @(spec.Faculty?.FacultyName ?? "Не указан")
+                                </p>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-award text-cyan-700 text-lg mr-2"></i>
+                                <p class="text-base sm:text-lg text-gray-600">
+                                    <span class="font-medium text-gray-700">Всего грантов:</span> @(grant?.TotalGrantPlaces.ToString() ?? "0")
+                                </p>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-award text-cyan-700 text-lg mr-2"></i>
+                                <p class="text-base sm:text-lg text-gray-600">
+                                    <span class="font-medium text-gray-700">Доступно грантов:</span> @(grant?.AvailableGrantPlaces.ToString() ?? "0")
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            @if (grant != null && grant.AvailableGrantPlaces > 0)
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors">
+                                    <i class="fas fa-award mr-1"></i> Гранты доступны
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-award mr-1"></i> Гранты недоступны
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>

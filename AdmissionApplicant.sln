@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.36105.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdmissionApplicant", "AdmissionApplicant\AdmissionApplicant.csproj", "{E11820A7-2820-41A9-AD0E-1A5A6C3F1E9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdmissionSystem", "..\AdmissionSystem\AdmissionSystem\AdmissionSystem.csproj", "{BF72958D-D309-C499-FD3E-C1AE4A1DC118}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E11820A7-2820-41A9-AD0E-1A5A6C3F1E9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E11820A7-2820-41A9-AD0E-1A5A6C3F1E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E11820A7-2820-41A9-AD0E-1A5A6C3F1E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E11820A7-2820-41A9-AD0E-1A5A6C3F1E9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF72958D-D309-C499-FD3E-C1AE4A1DC118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF72958D-D309-C499-FD3E-C1AE4A1DC118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF72958D-D309-C499-FD3E-C1AE4A1DC118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF72958D-D309-C499-FD3E-C1AE4A1DC118}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7FDF30A-D6CB-4DFD-846B-41FA4EE1A2A7}
+	EndGlobalSection
+EndGlobal

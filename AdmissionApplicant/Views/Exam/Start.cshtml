@@ -1,0 +1,606 @@
+﻿@model List<AdmissionSystem.Models.ExamQuestion>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Экзамен</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .modal.active {
+                display: flex;
+            }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+            .modal-content h4 {
+                color: #b91c1c;
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            .modal-content p {
+                color: #4b5563;
+                font-size: 1.125rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .modal-content button {
+                background: #b91c1c;
+                color: #fff;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+
+                .modal-content button:hover {
+                    background: #991b1b;
+                }
+
+            .modal-content .btn-confirm {
+                background: #047857;
+            }
+
+                .modal-content .btn-confirm:hover {
+                    background: #065f46;
+                }
+
+        .progress-bar {
+            height: 2rem;
+            background: #e5e7eb;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .progress {
+            height: 100%;
+            background: #047857;
+            transition: width 0.3s;
+        }
+
+        .question, .question * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #examContent {
+            display: none;
+        }
+
+        .timer {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .exam-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-top: 6rem;
+            margin-bottom: 4rem;
+        }
+
+        .submit-btn {
+            background: #1d4ed8;
+        }
+
+            .submit-btn:hover {
+                background: #1e40af;
+            }
+
+        .form-check-input:checked {
+            background-color: #047857;
+            border-color: #047857;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+            .form-check-label:hover {
+                background-color: #e5e7eb;
+            }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-check-input {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+            .form-check-input:checked + .form-check-label {
+                background-color: #d1fae5;
+            }
+    </style>
+</head>
+<body>
+    <div id="startModal" class="modal active">
+        <div class="modal-content">
+            <h4>Начало экзамена</h4>
+            <p>Нажмите "Начать", чтобы открыть экзамен в полноэкранном режиме. Покидать страницу или открывать другие программы запрещено.</p>
+            <button onclick="startExam()">Начать</button>
+        </div>
+    </div>
+
+    <div id="examContent" class="exam-container">
+        <div class="timer" id="timer">Осталось: 30:00</div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Экзамен</h2>
+        <div class="mb-6 text-gray-600">
+            <p>Вопросов: @ViewBag.TotalQuestions</p>
+            <p>Отвечено: <span id="answeredCount">0</span></p>
+            <p>Процент выполнения: <span id="progressPercent">0</span>%</p>
+            @{
+                var pastScores = ViewBag.PastScores as List<decimal>;
+                if (pastScores != null && pastScores.Any())
+                {
+                    var formattedScores = pastScores.Select(score => score.ToString("F2")).ToList();
+                    <p>Прошлые результаты: @string.Join(", ", formattedScores)</p>
+                }
+                var pastAnswers = ViewBag.PastAnswers as List<dynamic>;
+                if (pastAnswers != null && pastAnswers.Any())
+                {
+                    var scoresByAttempt = new List<(DateTime Date, decimal Score)>();
+                    var groupedByDate = pastAnswers.GroupBy(a => ((DateTime)a.AttemptDate).Date);
+                    foreach (var group in groupedByDate)
+                    {
+                        decimal totalScore = 0;
+                        foreach (var answer in group)
+                        {
+                            totalScore += (decimal)answer.Score;
+                        }
+                        scoresByAttempt.Add((group.Key, totalScore));
+                    }
+                    <p>Предыдущие попытки: @string.Join(", ", scoresByAttempt.Select(a => $"Дата: {a.Date:dd.MM.yyyy}, Баллы: {a.Score}"))</p>
+                }
+            }
+        </div>
+        <form id="examForm" asp-action="Submit" method="post" class="space-y-6">
+            <input type="hidden" name="applicationId" value="@ViewContext.HttpContext.Request.Query["applicationId"]" />
+            @foreach (var question in Model)
+            {
+                <div class="question bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-lg font-semibold text-gray-800 mb-2">@question.Question</label>
+                    @{
+                        var options = question.Options.Split(';').Select((opt, index) => new { Text = opt.Trim(), Letter = ((char)('A' + index)).ToString() }).ToList();
+                    }
+                    @foreach (var option in options)
+                    {
+                        var isChecked = pastAnswers != null && pastAnswers.Any(a => a.QuestionID == question.QuestionID && a.UserAnswer == option.Letter);
+                        <div class="form-check mb-2">
+                            <input class="form-check-input answer-radio h-5 w-5 mr-2" type="radio" name="answers[@question.QuestionID]" id="answer_@question.QuestionID@option.Letter" value="@option.Letter" @(isChecked ? "checked" : "")>
+                            <label class="form-check-label text-gray-700 text-base" for="answer_@question.QuestionID@option.Letter">@option.Text</label>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="text-center">
+                <button type="submit" class="submit-btn w-full text-white py-3 rounded-lg text-lg font-semibold">Подтвердить</button>
+            </div>
+        </form>
+        <div class="progress-bar">
+            <div class="progress" id="progress" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Модальные окна (без изменений) -->
+    <div id="cheatModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-exclamation-triangle mr-2"></i>Внимание!</h4>
+            <p id="cheatMessage">Вы покинули страницу экзамена. Осталось попыток: <span id="attemptsLeft">2</span>. Вернитесь.</p>
+            <button id="closeCheatModal" onclick="closeCheatModal()">Вернуться</button>
+        </div>
+    </div>
+
+    <div id="timeoutModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-exclamation-triangle mr-2"></i>Срочное предупреждение!</h4>
+            <p id="timeoutMessage">Вы снова покинули страницу экзамена. Вернитесь в течение <span id="timeoutCountdown">10</span> секунд!</p>
+            <button id="closeTimeoutModal" onclick="closeTimeoutModal()">Вернуться</button>
+        </div>
+    </div>
+
+    <div id="blockModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-ban mr-2"></i>Экзамен заблокирован!</h4>
+            <p>Вы превысили допустимое количество попыток списывания.</p>
+            <button id="endExamButton" onclick="endExam()">Завершить экзамен</button>
+        </div>
+    </div>
+
+    <div id="timeUpModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-clock mr-2"></i>Время вышло!</h4>
+            <p>Ваши ответы будут отправлены автоматически.</p>
+        </div>
+    </div>
+
+    <div id="incompleteModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-exclamation-circle mr-2"></i>Незавершённый экзамен</h4>
+            <p>Ответьте на все вопросы, чтобы завершить экзамен.</p>
+            <button onclick="closeIncompleteModal()">Продолжить</button>
+        </div>
+    </div>
+
+    <div id="confirmSubmitModal" class="modal">
+        <div class="modal-content">
+            <h4><i class="fas fa-check-circle mr-2"></i>Завершение экзамена</h4>
+            <p>Вы ответили на все вопросы. Завершить экзамен?</p>
+            <button class="btn-confirm" onclick="submitExam()">Подтвердить</button>
+            <button onclick="closeConfirmSubmitModal()">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        const examDuration = 30 * 60;
+        const applicationId = parseInt('@ViewContext.HttpContext.Request.Query["applicationId"]') || 0;
+        const totalQuestions = @ViewBag.TotalQuestions;
+        let startTime = @ViewContext.HttpContext.Session.GetInt32($"ExamStartTime_{ViewContext.HttpContext.Request.Query["applicationId"]}") || null;
+        let endTime = null;
+        let answeredCount = document.querySelectorAll('input.answer-radio:checked').length;
+        let isModalOpen = false;
+        let lastCheatLogTime = 0;
+        const cheatLogCooldown = 5000;
+        let cheatAttempts = @ViewContext.HttpContext.Session.GetInt32($"CheatAttempts_{ViewContext.HttpContext.Request.Query["applicationId"]}") || 0;
+        let isSubmitting = false;
+        let isExamStarted = false;
+        let examStartTimestamp = 0;
+        let timeoutTimer = null;
+        let isTimeoutModalActive = false;
+        let isTimeUp = false;
+        let cheatCheckInterval = null;
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
+            clearInterval(timeoutTimer);
+            isModalOpen = false;
+            isTimeoutModalActive = false;
+            console.log('[closeAllModals] Все модальные окна закрыты');
+        }
+
+        function showModal(modalId) {
+            closeAllModals();
+            isModalOpen = true;
+            document.getElementById(modalId).classList.add('active');
+            console.log(`[showModal] Открыта модалка: ${modalId}`);
+        }
+
+        function updateProgress() {
+            answeredCount = document.querySelectorAll('input.answer-radio:checked').length;
+            const percent = totalQuestions ? (answeredCount / totalQuestions) * 100 : 0;
+            document.getElementById('answeredCount').textContent = answeredCount;
+            document.getElementById('progressPercent').textContent = percent.toFixed(0);
+            document.getElementById('progress').style.width = percent + '%';
+            console.log('[updateProgress] Прогресс: answeredCount=', answeredCount, 'totalQuestions=', totalQuestions, 'percent=', percent.toFixed(0) + '%');
+        }
+
+        function startExam() {
+            console.log('[startExam] Запуск экзамена, applicationId=', applicationId);
+            if (!applicationId) {
+                console.error('[startExam] applicationId отсутствует');
+                return;
+            }
+            closeAllModals();
+            document.getElementById('examContent').style.display = 'block';
+            if (!startTime) {
+                startTime = Math.floor(Date.now() / 1000);
+                fetch(`/Exam/UpdateStartTime?applicationId=${applicationId}&startTime=${startTime}`, {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    console.log('[startExam] Время старта сохранено:', data);
+                }).catch(error => console.error('[startExam] Ошибка сохранения времени:', error));
+            }
+            endTime = startTime + examDuration;
+            isExamStarted = true;
+            examStartTimestamp = Date.now();
+            document.documentElement.requestFullscreen().catch(error => {
+                console.warn('[startExam] Не удалось включить полноэкранный режим:', error);
+            });
+            updateProgress();
+            setInterval(updateTimer, 1000);
+            cheatCheckInterval = setInterval(checkCheatingState, 2000);
+            console.log('[startExam] Античит запущен');
+        }
+
+        function updateTimer() {
+            if (!isExamStarted || !endTime || isTimeUp) return;
+            const now = Math.floor(Date.now() / 1000);
+            const timeLeft = endTime - now;
+            if (timeLeft <= 0) {
+                console.log('[updateTimer] Время вышло');
+                isTimeUp = true;
+                showModal('timeUpModal');
+                isSubmitting = true;
+                setTimeout(() => {
+                    submitExam();
+                }, 2000);
+                return;
+            }
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Осталось: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function logCheatAttempt(reason) {
+            if (!isExamStarted || cheatAttempts >= 3 || isTimeUp) {
+                console.log('[logCheatAttempt] Отмена: isExamStarted=', isExamStarted, 'cheatAttempts=', cheatAttempts, 'isTimeUp=', isTimeUp);
+                return;
+            }
+            if (Date.now() - examStartTimestamp < 2000) {
+                console.log('[logCheatAttempt] Игнорируем: слишком рано после старта');
+                return;
+            }
+            const now = Date.now();
+            if (now - lastCheatLogTime < cheatLogCooldown) {
+                console.log('[logCheatAttempt] Кулдаун для сервера:', now - lastCheatLogTime);
+                showTimeoutModal();
+                return;
+            }
+            lastCheatLogTime = now;
+            console.log('[logCheatAttempt] Регистрация попытки списывания:', reason);
+            fetch(`/Exam/LogCheatAttempt?applicationId=${applicationId}`, {
+                method: 'POST'
+            }).then(response => {
+                if (!response.ok) throw new Error(`[logCheatAttempt] Ошибка сервера: ${response.status}`);
+                return response.json();
+            }).then(data => {
+                cheatAttempts = data.cheatAttempts || cheatAttempts + 1;
+                console.log('[logCheatAttempt] Ответ сервера: blocked=', data.blocked, 'cheatAttempts=', cheatAttempts);
+                if (cheatAttempts < 3 && !data.blocked) {
+                    showCheatModal();
+                } else {
+                    showBlockModal();
+                }
+            }).catch(error => {
+                console.error('[logCheatAttempt] Ошибка:', error);
+                showCheatModal();
+            });
+        }
+
+        function showCheatModal() {
+            if (!isModalOpen && !isTimeoutModalActive && cheatAttempts < 3 && !isTimeUp) {
+                showModal('cheatModal');
+                document.getElementById('cheatMessage').innerHTML = `Вы покинули страницу экзамена. Осталось попыток: <span id="attemptsLeft">${3 - cheatAttempts}</span>. Вернитесь.`;
+                console.log('[showCheatModal] Модалка показана, cheatAttempts=', cheatAttempts);
+            }
+        }
+
+        function closeCheatModal() {
+            if (cheatAttempts >= 3) {
+                showBlockModal();
+                return;
+            }
+            closeAllModals();
+            document.documentElement.requestFullscreen().catch(error => {
+                console.warn('[closeCheatModal] Не удалось вернуть полноэкранный режим:', error);
+            });
+            console.log('[closeCheatModal] Модалка закрыта');
+            setTimeout(checkCheatingState, 500);
+        }
+
+        function showTimeoutModal() {
+            if (!isModalOpen && !isTimeoutModalActive && cheatAttempts < 3 && !isTimeUp) {
+                showModal('timeoutModal');
+                isTimeoutModalActive = true;
+                let timeLeft = 10;
+                document.getElementById('timeoutCountdown').textContent = timeLeft;
+                console.log('[showTimeoutModal] Таймер модалки запущен');
+                timeoutTimer = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timeoutCountdown').textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timeoutTimer);
+                        cheatAttempts = 3;
+                        showBlockModal();
+                    }
+                }, 1000);
+            }
+        }
+
+        function closeTimeoutModal() {
+            if (cheatAttempts >= 3) {
+                showBlockModal();
+                return;
+            }
+            closeAllModals();
+            document.documentElement.requestFullscreen().catch(error => {
+                console.warn('[closeTimeoutModal] Не удалось вернуть полноэкранный режим:', error);
+            });
+            console.log('[closeTimeoutModal] Таймер модалки закрыт');
+            setTimeout(checkCheatingState, 500);
+        }
+
+        function showBlockModal() {
+            showModal('blockModal');
+            console.log('[showBlockModal] Модалка блокировки показана');
+        }
+
+        function endExam() {
+            console.log('[endExam] Завершение экзамена, редирект на /Exam/Blocked');
+            window.location.href = '/Exam/Blocked';
+        }
+
+        function showIncompleteModal() {
+            if (!isModalOpen && !isTimeoutModalActive && !isTimeUp) {
+                showModal('incompleteModal');
+                console.log('[showIncompleteModal] Модалка незавершённых ответов показана');
+            }
+        }
+
+        function closeIncompleteModal() {
+            closeAllModals();
+            console.log('[closeIncompleteModal] Модалка незавершённых ответов закрыта');
+        }
+
+        function showConfirmSubmitModal() {
+            if (!isModalOpen && !isTimeoutModalActive && !isTimeUp) {
+                showModal('confirmSubmitModal');
+                console.log('[showConfirmSubmitModal] Модалка подтверждения показана');
+            }
+        }
+
+        function closeConfirmSubmitModal() {
+            closeAllModals();
+            console.log('[closeConfirmSubmitModal] Модалка подтверждения закрыта');
+        }
+
+        function submitExam() {
+            if (isSubmitting) return;
+            console.log('[submitExam] Отправка формы, applicationId=', applicationId);
+            isSubmitting = true;
+            const formData = new FormData(document.getElementById('examForm'));
+            for (let [key, value] of formData.entries()) {
+                console.log(`[FormData] ${key}: ${value}`);
+            }
+            fetch(`/Exam/Submit`, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (!response.ok) throw new Error(`[submitExam] Ошибка сервера: ${response.status}`);
+                console.log('[submitExam] Форма отправлена, редирект на /Application/Index');
+                window.location.href = '/Application/Index';
+            }).catch(error => {
+                console.error('[submitExam] Ошибка отправки формы:', error);
+                isSubmitting = false;
+                closeConfirmSubmitModal();
+            });
+        }
+
+        function checkCheatingState() {
+            if (!isExamStarted || cheatAttempts >= 3 || isTimeUp) return;
+            if (Date.now() - examStartTimestamp < 2000) {
+                console.log('[checkCheatingState] Игнорируем: слишком рано после старта');
+                return;
+            }
+            if (document.hidden || !document.fullscreenElement) {
+                console.log('[checkCheatingState] Нарушение: hidden=', document.hidden, 'fullscreen=', !!document.fullscreenElement);
+                logCheatAttempt('checkCheatingState');
+            }
+        }
+
+        function initializeEventListeners() {
+            document.addEventListener('visibilitychange', () => {
+                if (isExamStarted && !isModalOpen && !isTimeoutModalActive && !isTimeUp) {
+                    if (document.hidden) {
+                        console.log('[visibilitychange] Таб скрыт');
+                        logCheatAttempt('visibilitychange');
+                    } else {
+                        console.log('[visibilitychange] Таб виден, проверяем состояние');
+                        checkCheatingState();
+                    }
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement && isExamStarted && !isModalOpen && !isTimeoutModalActive && !isTimeUp) {
+                    console.log('[fullscreenchange] Полноэкранный режим отключен');
+                    logCheatAttempt('fullscreenchange');
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                if (isExamStarted && !isModalOpen && !isTimeoutModalActive && !isTimeUp) {
+                    console.log('[blur] Потеря фокуса');
+                    logCheatAttempt('blur');
+                }
+            });
+
+            window.addEventListener('beforeunload', (e) => {
+                if (isExamStarted && !isSubmitting && !isTimeUp) {
+                    e.preventDefault();
+                }
+            });
+
+            document.getElementById('examForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (isTimeUp || isSubmitting) {
+                    console.log('[examForm] Отправка формы отменена: isTimeUp=', isTimeUp, 'isSubmitting=', isSubmitting);
+                    return;
+                }
+                updateProgress();
+                console.log('[examForm] Попытка отправки формы, answeredCount=', answeredCount, 'totalQuestions=', totalQuestions);
+                if (answeredCount < totalQuestions) {
+                    showIncompleteModal();
+                } else {
+                    showConfirmSubmitModal();
+                }
+            });
+
+            document.addEventListener('copy', (e) => e.preventDefault());
+            document.addEventListener('paste', (e) => e.preventDefault());
+            document.addEventListener('selectstart', (e) => e.preventDefault());
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+            document.querySelectorAll('input.answer-radio').forEach(input => {
+                input.addEventListener('change', updateProgress);
+            });
+        }
+
+        function initialize() {
+            closeAllModals();
+            document.getElementById('startModal').classList.add('active');
+            updateProgress();
+            initializeEventListeners();
+            console.log('[init] Страница загружена, applicationId=', applicationId, 'cheatAttempts=', cheatAttempts);
+        }
+
+        initialize();
+    </script>
+</body>
+</html>

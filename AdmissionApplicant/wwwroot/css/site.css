@@ -1,0 +1,152 @@
+/* site.css */
+/*body {
+    background: linear-gradient(135deg, #6e8ffb, #a3bffa);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+}
+*/
+
+.confirm-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: slide-up 0.6s ease-out;
+}
+
+.exam-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2.5rem;
+    max-width: 800px;
+    margin: 2rem auto;
+    animation: slide-up 0.5s ease-out;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: transform 0.3s;
+    font-size: 16px;
+}
+
+    .status-badge:hover {
+        transform: scale(1.1);
+    }
+
+.status-pending {
+    background-color: #ffeb3b;
+    color: #4a3b2f;
+}
+
+.status-grantapproved {
+    background-color: #22c55e;
+    color: white;
+}
+
+.status-rejected {
+    background-color: #ef4444;
+    color: white;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.exam-button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+    font-size: 1.25rem;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+    .exam-button:hover {
+        background-color: #2563eb;
+    }
+
+.btn-confirm {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+    font-size: 1.25rem;
+}
+
+    .btn-confirm:hover {
+        background-color: #2563eb;
+    }
+
+.btn-cancel {
+    background-color: #ef4444;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+    font-size: 1.25rem;
+}
+
+    .btn-cancel:hover {
+        background-color: #dc2626;
+    }
+
+.timer {
+    position: sticky;
+    top: 1rem;
+    background-color: #3b82f6;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    z-index: 1000;
+}
+
+.question {
+    margin-bottom: 2rem;
+}
+
+.submit-btn {
+    background-color: #22c55e;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+    font-size: 1.25rem;
+}
+
+    .submit-btn:hover {
+        background-color: #16a34a;
+    }
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

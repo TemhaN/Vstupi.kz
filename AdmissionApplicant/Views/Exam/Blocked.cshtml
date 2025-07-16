@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Доступ заблокирован - Вступи.kz</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(to right, #0891b2, #06b6d4);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .blocked-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 2.5rem;
+            max-width: 32rem;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .blocked-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            }
+
+        .blocked-icon {
+            font-size: 3.5rem;
+            color: #dc2626;
+            margin-bottom: 1rem;
+        }
+
+        .blocked-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 1rem;
+        }
+
+        .blocked-message {
+            font-size: 1.125rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-button {
+            background: #dc2626;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+            .contact-button:hover {
+                background: #b91c1c;
+                transform: scale(1.05);
+            }
+
+            .contact-button i {
+                margin-right: 0.5rem;
+            }
+    </style>
+</head>
+<body>
+    <div class="blocked-card">
+        <i class="fas fa-ban blocked-icon"></i>
+        <h2 class="blocked-title">Доступ заблокирован</h2>
+        <p class="blocked-message">
+            Вы превысили количество попыток, покинули страницу экзамена или пытались списать. Свяжитесь с администрацией для разблокировки.
+        </p>
+        <a href="mailto:support@vstupi.kz" class="contact-button">
+            <i class="fas fa-envelope"></i> Связаться с администрацией
+        </a>
+    </div>
+</body>
+</html>

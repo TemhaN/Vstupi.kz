@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Выход - Вступи.kz</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+</head>
+<div class="bg-gradient-to-r from-cyan-700 to-sky-500 min-h-screen flex items-center justify-center font-sans">
+    <!-- Карточка центрирована по вертикали и горизонтали -->
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center transform transition-transform hover:-translate-y-1 hover:shadow-3xl">
+        <i class="fas fa-sign-out-alt text-5xl text-red-600 mb-4"></i>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Выход из системы</h2>
+        <p class="text-base sm:text-lg text-gray-600 mb-6">Вы уверены, что хотите выйти?</p>
+        <form asp-action="LogoutConfirmed" method="post" class="flex justify-center space-x-4">
+            <button type="submit" class="inline-flex items-center bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-700 transform transition-transform hover:scale-105">
+                <i class="fas fa-sign-out-alt mr-2"></i> Выйти
+            </button>
+            <a href="@Url.Action("Index", "Home")" class="inline-flex items-center bg-gray-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-gray-600 transform transition-transform hover:scale-105">
+                <i class="fas fa-times mr-2"></i> Отмена
+            </a>
+        </form>
+    </div>
+</div>
+</html>
