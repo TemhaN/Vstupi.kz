@@ -40,7 +40,7 @@
 
 1. **Клонируйте репозиторий**:
    ```bash
-   git clone https://github.com/yourusername/Vstupi.kz.git
+   git clone https://github.com/TemhaN/Vstupi.kz.git
    cd Vstupi.kz
 
 2. **Настройте базу данных**:
